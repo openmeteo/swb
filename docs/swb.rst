@@ -44,9 +44,8 @@ Installation and usage
        theta_s=0.425,
        theta_fc=0.287,
        theta_wp=0.14,
-       rd=0.5,
+       zr=0.5,
        zr_factor=1000,
-       kc=0.7,
        p=0.5,
        draintime=2.2,
        effective_precipitation=some_pandas_timeseries,
@@ -225,9 +224,8 @@ Reference
            theta_s=0.425,
            theta_fc=0.287,
            theta_wp=0.14,
-           rd=0.5,
+           zr=0.5,
            zr_factor=1000,
-           kc=0.7,
            p=0.5,
            draintime=2.2,
            effective_precipitation=some_pandas_timeseries,
@@ -254,25 +252,23 @@ Reference
       field capacity.
 
    :param dataframe crop_evapotranspiration:
-      A pandas continuous (no missing values) daily time series (or
-      dataframe indexed by date). It should be in mm (more precisely, in
-      the same unit as the resulting depletion). It is the potential
-      crop evapotranspiration (that is, the reference evapotranspiration
-      multiplied by the crop coefficient |K_c|).
+      A pandas continuous (no missing values) time series. It should be
+      in mm (more precisely, in the same unit as the resulting
+      depletion). It is the potential crop evapotranspiration (that is,
+      the reference evapotranspiration multiplied by the crop
+      coefficient |K_c|).
 
    :param dataframe effective_precipitation:
-      A pandas continuous (no missing values) daily time series (or
-      dataframe indexed by date). It should be in mm (more precisely, in
-      the same unit as the resulting depletion). It is the effective
-      precipitation.
+      A pandas continuous (no missing values) time series.  It should be
+      in mm (more precisely, in the same unit as the resulting
+      depletion). It is the effective precipitation.
 
    :param dataframe net_irrigation:
-      A pandas daily time series (or dataframe indexed by date). It
-      should be in mm (more precisely, in the same unit as the resulting
-      depletion). It is the applied net irrigation (that is, the total
-      applied irrigation multiplied by the irrigation efficiency). It
-      is allowed for it to contain only the irrigation events; missing
-      days are assumed zero.
+      A pandas time series. It should be in mm (more precisely, in the
+      same unit as the resulting depletion). It is the applied net
+      irrigation (that is, the total applied irrigation multiplied by
+      the irrigation efficiency). It is allowed for it to contain only
+      the irrigation events; missing days are assumed zero.
 
       This parameter may be ``None``. In that case, we assume that, in
       each time step, irrigation equal to the theoretically calculated
