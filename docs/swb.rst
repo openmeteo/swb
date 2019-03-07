@@ -48,9 +48,7 @@ Installation and usage
        zr_factor=1000,
        p=0.5,
        draintime=2.2,
-       effective_precipitation=some_pandas_timeseries,
-       crop_evapotranspiration=some_other_pandas_timeseries,
-       net_irrigation=another_pandas_timeseries,
+       timeseries=a_pandas_dataframe,
        theta_init=0.19,
        mif=0.5,
    )
@@ -228,9 +226,7 @@ Reference
            zr_factor=1000,
            p=0.5,
            draintime=2.2,
-           effective_precipitation=some_pandas_timeseries,
-           crop_evapotranspiration=some_other_pandas_timeseries,
-           net_irrigation=another_pandas_timeseries,
+           timeseries=a_pandas_dataframe,
            theta_init=0.19,
            mif=0.5,
        )
@@ -251,32 +247,25 @@ Reference
       The time, in days, needed for the soil to drain from saturation to
       field capacity.
 
-   :param dataframe crop_evapotranspiration:
-      A pandas continuous (no missing values) time series. It should be
-      in mm (more precisely, in the same unit as the resulting
-      depletion). It is the potential crop evapotranspiration (that is,
-      the reference evapotranspiration multiplied by the crop
-      coefficient |K_c|).
+   :param dataframe timeseries:
+      A pandas dataframe indexed by date, containing two or three
+      columns with input time series. The dataframe and its time series
+      must be continuous and have no missing values. The columns are
+      "crop_evapotranspiration", "effective_precipitation", and,
+      optionally, "net_irrigation". All time series should be in mm;
+      more precisely, in the same unit as the resulting depletion.
 
-   :param dataframe effective_precipitation:
-      A pandas continuous (no missing values) time series.  It should be
-      in mm (more precisely, in the same unit as the resulting
-      depletion). It is the effective precipitation.
+      The "crop_evapotranspiration" is the potential crop
+      evapotranspiration (that is, the reference evapotranspiration
+      multiplied by the crop coefficient |K_c|).
 
-   :param dataframe net_irrigation:
-      A pandas time series. It should be in mm (more precisely, in the
-      same unit as the resulting depletion). It is the applied net
-      irrigation (that is, the total applied irrigation multiplied by
-      the irrigation efficiency). It is allowed for it to contain only
-      the irrigation events; missing days are assumed zero.
-
-      This parameter may be ``None``. In that case, we assume that, in
+      The "net_irrigation" is the applied net irrigation (that is, the
+      total applied irrigation multiplied by the irrigation efficiency).
+      This column may be missing. In that case, we assume that, in
       each time step, irrigation equal to the theoretically calculated
       amount is applied . If you want to assume zero irrigation, pass an
-      empty pandas time series instead.
-
-      If this parameter is ``None``, then ``net_irrigation`` is produced
-      as output.
+      all-zero column instead. If the "net_irrigation" is missing, then
+      it is produced as output.
 
    :param float theta_init:
       The initial water content (that is, the water content at the first date
@@ -293,13 +282,13 @@ Reference
       :raw: The readily available water.
       :taw: The total available water.
       :timeseries:
-         A pandas dataframe indexed by date, containing model results.
-         It contains as many rows as there are in the input time series, with
-         the same time stamps, and columns ``dr`` for depletion, ``theta`` for
-         soil moisture, and ``ks`` for the water stress coefficient. If the
-         function was called with ``net_irrigation=None``, then ``timeseries``
-         also contains a ``net_irrigation`` column with the calculated net
-         irrigation.
+         The original dataframe with additional columns added, namely
+         ``dr`` for depletion, ``theta`` for soil moisture, and ``ks``
+         for the water stress coefficient. If the ``net_irrigation``
+         column was originally missing, it is added and contains the
+         calculated net irrigation. The original dataframe is changed
+         in place (so the caller doesn't really need it returned), but
+         the original columns and index are untouched.
 
 References
 ==========
