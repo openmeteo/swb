@@ -251,9 +251,9 @@ Reference
       A pandas dataframe indexed by date, containing two or three
       columns with input time series. The dataframe and its time series
       must be continuous and have no missing values. The columns are
-      "crop_evapotranspiration", "effective_precipitation", and,
-      optionally, "actual_net_irrigation". All time series should be in
-      mm; more precisely, in the same unit as the resulting depletion.
+      "crop_evapotranspiration", "effective_precipitation" and
+      "actual_net_irrigation". All time series should be in mm; more
+      precisely, in the same unit as the resulting depletion.
 
       The "crop_evapotranspiration" is the potential crop
       evapotranspiration (that is, the reference evapotranspiration
@@ -261,11 +261,12 @@ Reference
 
       The "actual_net_irrigation" is the applied net irrigation (that
       is, the total applied irrigation multiplied by the irrigation
-      efficiency).  This column may be missing. In that case, we assume
-      that, in each time step, irrigation equal to the theoretically
-      calculated amount is applied. If you want to assume zero
-      irrigation, pass an all-zero column instead. If the
-      "actual_net_irrigation" is missing, then it is produced as output.
+      efficiency).
+
+      If in a day it is known that we irrigated but not how much,
+      "applied_net_irrigation" may simply be the boolean ``True`` for
+      that day. In this case, it is assumed that we irrigated with the
+      recommended amount that was calculated by the model.
 
    :param float theta_init:
       The initial water content (that is, the water content at the first date
@@ -286,11 +287,9 @@ Reference
          ``dr`` for depletion, ``theta`` for soil moisture, ``ks`` for
          the water stress coefficient, and
          ``recommended_net_irrigation`` for the calculated recommended
-         net irrigation. If the ``actual_net_irrigation`` column was
-         originally missing, it is added and is identical to
-         ``recommended_net_irrigation``.  The original dataframe is
-         changed in place (so the caller doesn't really need it
-         returned), but the original columns and index are untouched.
+         net irrigation.  The original dataframe is changed in place (so
+         the caller doesn't really need it returned), but the original
+         columns and index are untouched.
 
 References
 ==========
