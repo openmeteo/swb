@@ -23,7 +23,8 @@ class SoilWaterBalance(object):
     # effective_precipitation - Effective precipitation
     # evapotranspiration - Reference evapotranspiration
     # crop_evapotranspiration - The reference evaporation multiplied by kc
-    # net_irrigation - The total irrigation multiplied by the irrigation efficiency
+    # actual_net_irrigation - The actual supplied net irrigation
+    # recommended_net_irrigation - The calculated required net irrigation
     # ro - Surface runoff
     # cr - Capillary rise
     # dp - Deep percolation
@@ -53,9 +54,10 @@ class SoilWaterBalance(object):
         self.timeseries["dr"] = np.nan
         self.timeseries["theta"] = np.nan
         self.timeseries["ks"] = np.nan
-        auto_apply_irrigation = "net_irrigation" not in self.timeseries
+        self.timeseries["recommended_net_irrigation"] = np.nan
+        auto_apply_irrigation = "actual_net_irrigation" not in self.timeseries
         if auto_apply_irrigation:
-            self.timeseries["net_irrigation"] = 0.0
+            self.timeseries["actual_net_irrigation"] = 0.0
 
         # Loop and perform the calculation
         theta_prev = self.theta_init
@@ -63,13 +65,19 @@ class SoilWaterBalance(object):
         for date in self.timeseries.index:
             row = self.timeseries.loc[date]
             dr = self.dr(dr_prev, theta_prev, row)
+            recommended_net_irrigation = dr * self.mif if dr > self.raw else 0
             if auto_apply_irrigation and dr > self.raw:
-                self.timeseries.at[date, "net_irrigation"] = dr * self.mif
-                dr *= 1 - self.mif
+                self.timeseries.at[
+                    date, "actual_net_irrigation"
+                ] = recommended_net_irrigation
+                dr -= recommended_net_irrigation
             theta = self.theta_from_dr(dr)
             self.timeseries.at[date, "dr"] = dr
             self.timeseries.at[date, "theta"] = theta
             self.timeseries.at[date, "ks"] = self.ks(dr)
+            self.timeseries.at[
+                date, "recommended_net_irrigation"
+            ] = recommended_net_irrigation
             theta_prev = theta
             dr_prev = dr
 
@@ -104,6 +112,6 @@ class SoilWaterBalance(object):
                 row["effective_precipitation"]
                 - self.ro(row["effective_precipitation"], theta_prev)
             )
-            - row["net_irrigation"]
+            - row["actual_net_irrigation"]
             + row["crop_evapotranspiration"]
         )

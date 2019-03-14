@@ -53,11 +53,11 @@ class SimpleMethodsTestCase(TestCase):
         self.assertEqual(self.swb.ro(2, 0.14), 0)
 
 
-class ModelRunWithNetIrrigationTestCase(TestCase):
+class ModelRunWithActualNetIrrigationTestCase(TestCase):
     def setUp(self):
         data = {
             "effective_precipitation": [0, 4.8],
-            "net_irrigation": [0, 0],
+            "actual_net_irrigation": [0, 0],
             "crop_evapotranspiration": [3.871, 3.990],
         }
         self.df = pd.DataFrame(data, index=pd.date_range("2019-03-07", periods=2))
@@ -92,8 +92,14 @@ class ModelRunWithNetIrrigationTestCase(TestCase):
     def test_ks2(self):
         self.assertAlmostEqual(self.df.iloc[1]["ks"], 1)
 
+    def test_recommended_net_irrigation1(self):
+        self.assertAlmostEqual(self.df.iloc[0]["recommended_net_irrigation"], 0)
 
-class ModelRunWithoutNetIrrigationTestCase(TestCase):
+    def test_recommended_net_irrigation2(self):
+        self.assertAlmostEqual(self.df.iloc[1]["recommended_net_irrigation"], 0)
+
+
+class ModelRunWithoutActualNetIrrigationTestCase(TestCase):
     def setUp(self):
         data = {
             "effective_precipitation": [0, 0, 0],
@@ -131,14 +137,27 @@ class ModelRunWithoutNetIrrigationTestCase(TestCase):
     def test_theta3(self):
         self.assertAlmostEqual(self.df.iloc[2]["theta"], 0.279, places=3)
 
-    def test_net_irrigation1(self):
-        self.assertAlmostEqual(self.df.iloc[0]["net_irrigation"], 0)
+    def test_recommended_net_irrigation1(self):
+        self.assertAlmostEqual(self.df.iloc[0]["recommended_net_irrigation"], 0)
 
-    def test_net_irrigation2(self):
-        self.assertAlmostEqual(self.df.iloc[1]["net_irrigation"], 39.146, places=3)
+    def test_recommended_net_irrigation2(self):
+        self.assertAlmostEqual(
+            self.df.iloc[1]["recommended_net_irrigation"], 39.146, places=3
+        )
 
-    def test_net_irrigation3(self):
-        self.assertAlmostEqual(self.df.iloc[2]["net_irrigation"], 0)
+    def test_recommended_net_irrigation3(self):
+        self.assertAlmostEqual(self.df.iloc[2]["recommended_net_irrigation"], 0)
+
+    def test_actual_net_irrigation1(self):
+        self.assertAlmostEqual(self.df.iloc[0]["actual_net_irrigation"], 0)
+
+    def test_actual_net_irrigation2(self):
+        self.assertAlmostEqual(
+            self.df.iloc[1]["actual_net_irrigation"], 39.146, places=3
+        )
+
+    def test_actual_net_irrigation3(self):
+        self.assertAlmostEqual(self.df.iloc[2]["actual_net_irrigation"], 0)
 
 
 class MifTestCase(TestCase):
@@ -170,11 +189,13 @@ class MifTestCase(TestCase):
     def test_dr3(self):
         self.assertAlmostEqual(self.df.iloc[2]["dr"], 23.458, places=3)
 
-    def test_net_irrigation1(self):
-        self.assertAlmostEqual(self.df.iloc[0]["net_irrigation"], 0)
+    def test_actual_net_irrigation1(self):
+        self.assertAlmostEqual(self.df.iloc[0]["actual_net_irrigation"], 0)
 
-    def test_net_irrigation2(self):
-        self.assertAlmostEqual(self.df.iloc[1]["net_irrigation"], 19.573, places=3)
+    def test_actual_net_irrigation2(self):
+        self.assertAlmostEqual(
+            self.df.iloc[1]["actual_net_irrigation"], 19.573, places=3
+        )
 
-    def test_net_irrigation3(self):
-        self.assertAlmostEqual(self.df.iloc[2]["net_irrigation"], 0)
+    def test_actual_net_irrigation3(self):
+        self.assertAlmostEqual(self.df.iloc[2]["actual_net_irrigation"], 0)
