@@ -64,7 +64,8 @@ class SoilWaterBalance(object):
         dr_prev = self.dr_from_theta(theta_prev)
         for date in self.timeseries.index:
             row = self.timeseries.loc[date]
-            dr = self.dr(dr_prev, theta_prev, row)
+            ks = self.ks(dr_prev)
+            dr = self.dr(dr_prev, theta_prev, ks, row)
             recommended_net_irrigation = dr * self.mif if dr > self.raw else 0
             if auto_apply_irrigation and dr > self.raw:
                 self.timeseries.at[
@@ -74,7 +75,7 @@ class SoilWaterBalance(object):
             theta = self.theta_from_dr(dr)
             self.timeseries.at[date, "dr"] = dr
             self.timeseries.at[date, "theta"] = theta
-            self.timeseries.at[date, "ks"] = self.ks(dr)
+            self.timeseries.at[date, "ks"] = ks
             self.timeseries.at[
                 date, "recommended_net_irrigation"
             ] = recommended_net_irrigation
@@ -104,7 +105,7 @@ class SoilWaterBalance(object):
         else:
             return self.dp_when_above_field_capacity
 
-    def dr(self, dr_prev, theta_prev, row):
+    def dr(self, dr_prev, theta_prev, ks, row):
         # "row" is a single row from self.timeseries
         return (
             dr_prev
@@ -113,5 +114,5 @@ class SoilWaterBalance(object):
                 - self.ro(row["effective_precipitation"], theta_prev)
             )
             - row["actual_net_irrigation"]
-            + row["crop_evapotranspiration"]
+            + row["crop_evapotranspiration"] * ks
         )

@@ -99,6 +99,46 @@ class ModelRunWithActualNetIrrigationTestCase(TestCase):
         self.assertAlmostEqual(self.df.iloc[1]["recommended_net_irrigation"], 0)
 
 
+class ModelRunWithNonzeroKsTestCase(TestCase):
+    def setUp(self):
+        data = {
+            "effective_precipitation": [0, 0],
+            "actual_net_irrigation": [0, 0],
+            "crop_evapotranspiration": [3.724, 3.906],
+        }
+        self.df = pd.DataFrame(data, index=pd.date_range("2019-08-18", periods=2))
+        calculate_soil_water(
+            theta_s=0.425,
+            theta_fc=0.287,
+            theta_wp=0.14,
+            zr=0.5,
+            zr_factor=1000,
+            p=0.5,
+            draintime=16.2,
+            timeseries=self.df,
+            theta_init=0.218956,
+            mif=1,
+        )
+
+    def test_dr1(self):
+        self.assertAlmostEqual(self.df.iloc[0]["dr"], 37.746, places=3)
+
+    def test_dr2(self):
+        self.assertAlmostEqual(self.df.iloc[1]["dr"], 41.546, places=3)
+
+    def test_theta1(self):
+        self.assertAlmostEqual(self.df.iloc[0]["theta"], 0.212, places=3)
+
+    def test_theta2(self):
+        self.assertAlmostEqual(self.df.iloc[1]["theta"], 0.204, places=3)
+
+    def test_ks1(self):
+        self.assertAlmostEqual(self.df.iloc[0]["ks"], 1)
+
+    def test_ks2(self):
+        self.assertAlmostEqual(self.df.iloc[1]["ks"], 0.973, places=3)
+
+
 class ModelRunWithoutActualNetIrrigationTestCase(TestCase):
     def setUp(self):
         data = {
