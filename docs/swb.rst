@@ -1,11 +1,6 @@
-================================================
-:mod:`swb` --- Calculation of soil water balance
-================================================
-
-.. module:: swb
-   :synopsis: Calculation of soil water balance
-.. moduleauthor:: Stavros Anastasiadis <anastasiadis.st00@gmail.com>
-.. sectionauthor:: Antonis Christofides <anthony@itia.ntua.gr>
+==================================================================
+:func:`calculate_soil_water` --- Calculation of soil water balance
+==================================================================
 
 .. |CR_i| replace:: CR\ :sub:`i`
 .. |D_r| replace:: D\ :sub:`r`
@@ -29,12 +24,8 @@
 .. |p_eff| replace:: p\ :sub:`eff`
 
 
-Installation and usage
-======================
-
-::
-
-    pip install swb
+Usage
+=====
 
 ::
 
