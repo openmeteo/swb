@@ -5,4 +5,5 @@ Swb - soil water balance
    :maxdepth: 2
 
    swb
+   crop_evapotranspiration
    license
