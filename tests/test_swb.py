@@ -230,3 +230,34 @@ class MifTestCase(TestCase):
 
     def test_recommended_net_irrigation3(self):
         self.assertAlmostEqual(self.df.iloc[2]["recommended_net_irrigation"], 0)
+
+
+class ModelRunWithDpTestCase(TestCase):
+    def setUp(self):
+        data = {
+            "effective_precipitation": [0, 5.544, 2.664],
+            "actual_net_irrigation": [0, 0, 0],
+            "crop_evapotranspiration": [1.043, 0.952, 0.868],
+        }
+        self.df = pd.DataFrame(data, index=pd.date_range("2016-03-09", periods=3))
+        calculate_soil_water(
+            theta_s=0.425,
+            theta_fc=0.287,
+            theta_wp=0.14,
+            zr=0.5,
+            zr_factor=1000,
+            p=0.5,
+            draintime=16.3,
+            timeseries=self.df,
+            theta_init=0.284732,
+            mif=1.0,
+        )
+
+    def test_dr1(self):
+        self.assertAlmostEqual(self.df.iloc[0]["dr"], 2.177, places=3)
+
+    def test_dr2(self):
+        self.assertAlmostEqual(self.df.iloc[1]["dr"], -2.415, places=3)
+
+    def test_dr3(self):
+        self.assertAlmostEqual(self.df.iloc[2]["dr"], -1.796, places=3)

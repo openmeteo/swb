@@ -103,7 +103,10 @@ class SoilWaterBalance(object):
         if self.theta_fc >= theta:
             return 0
         else:
-            return self.dp_when_above_field_capacity
+            return min(
+                self.dp_when_above_field_capacity,
+                (theta - self.theta_fc) * self.zr * self.zr_factor,
+            )
 
     def dr_without_irrig(self, dr_prev, theta_prev, ks, row):
         # "row" is a single row from self.timeseries
@@ -114,4 +117,5 @@ class SoilWaterBalance(object):
                 - self.ro(row["effective_precipitation"], theta_prev)
             )
             + row["crop_evapotranspiration"] * ks
+            + self.dp(theta_prev)
         )
