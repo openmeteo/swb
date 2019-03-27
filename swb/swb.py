@@ -45,9 +45,6 @@ class SoilWaterBalance(object):
 
         self.taw = (self.theta_fc - self.theta_wp) * self.zr * self.zr_factor
         self.raw = self.p * self.taw
-        self.dp_when_above_field_capacity = (
-            (self.theta_s - self.theta_fc) * self.zr * self.zr_factor / self.draintime
-        )
 
     def calculate_timeseries(self):
         # Add columns to self.timeseries
@@ -99,14 +96,11 @@ class SoilWaterBalance(object):
         )
         return max(result, 0)
 
-    def dp(self, theta):
-        if self.theta_fc >= theta:
-            return 0
-        else:
-            return min(
-                self.dp_when_above_field_capacity,
-                (theta - self.theta_fc) * self.zr * self.zr_factor,
-            )
+    def dp(self, theta_prev, peff):
+        theta_prev_mm = theta_prev * self.zr * self.zr_factor
+        theta_fc_mm = self.theta_fc * self.zr * self.zr_factor
+        excess_water = theta_prev_mm - theta_fc_mm + peff
+        return max(excess_water, 0) / self.draintime
 
     def dr_without_irrig(self, dr_prev, theta_prev, ks, row):
         # "row" is a single row from self.timeseries
@@ -117,5 +111,5 @@ class SoilWaterBalance(object):
                 - self.ro(row["effective_precipitation"], theta_prev)
             )
             + row["crop_evapotranspiration"] * ks
-            + self.dp(theta_prev)
+            + self.dp(theta_prev, row["effective_precipitation"])
         )
