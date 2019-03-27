@@ -39,10 +39,10 @@ class SimpleMethodsTestCase(TestCase):
         self.assertAlmostEqual(self.swb.ks(30), 1)
 
     def test_dp(self):
-        self.assertAlmostEqual(self.swb.dp(0.311), 4.259, places=3)
+        self.assertAlmostEqual(self.swb.dp(0.311, 0), 0.741, places=3)
 
     def test_dp_zero(self):
-        self.assertEqual(self.swb.dp(0.186), 0)
+        self.assertEqual(self.swb.dp(0.186, 0), 0)
 
     def test_ro_at_saturation(self):
         # When we are already saturated (0.425), all precipitation (15 mm) runs off
@@ -239,7 +239,7 @@ class ModelRunWithDpTestCase(TestCase):
             "actual_net_irrigation": [0, 0, 0],
             "crop_evapotranspiration": [1.043, 0.952, 0.868],
         }
-        self.df = pd.DataFrame(data, index=pd.date_range("2016-03-09", periods=3))
+        self.df = pd.DataFrame(data, index=pd.date_range("2016-03-10", periods=3))
         calculate_soil_water(
             theta_s=0.425,
             theta_fc=0.287,
@@ -257,7 +257,7 @@ class ModelRunWithDpTestCase(TestCase):
         self.assertAlmostEqual(self.df.iloc[0]["dr"], 2.177, places=3)
 
     def test_dr2(self):
-        self.assertAlmostEqual(self.df.iloc[1]["dr"], -2.415, places=3)
+        self.assertAlmostEqual(self.df.iloc[1]["dr"], -2.208, places=3)
 
     def test_dr3(self):
-        self.assertAlmostEqual(self.df.iloc[2]["dr"], -1.796, places=3)
+        self.assertAlmostEqual(self.df.iloc[2]["dr"], -3.706, places=3)
