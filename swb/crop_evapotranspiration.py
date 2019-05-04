@@ -37,6 +37,8 @@ class CropEvapotranspiration(object):
         start = self.planting_date + dt.timedelta(days=self.init)
         end = start + dt.timedelta(days=self.dev - 1)
         dev_kcs = np.linspace(self.kc_ini, self.kc_mid, num=self.dev + 1)[1:]
+        period_length = len(self.timeseries.loc[start:end, "kc"])
+        dev_kcs = dev_kcs[:period_length]
         self.timeseries.loc[start:end, "kc"] = dev_kcs
 
     def _calculate_kc_for_mid_stage(self):
@@ -48,4 +50,6 @@ class CropEvapotranspiration(object):
         start = self.planting_date + dt.timedelta(days=self.init + self.dev + self.mid)
         end = start + dt.timedelta(days=self.late - 1)
         late_kcs = np.linspace(self.kc_mid, self.kc_end, num=self.late + 1)[1:]
+        period_length = len(self.timeseries.loc[start:, "kc"])
+        late_kcs = late_kcs[:period_length]
         self.timeseries.loc[start:end, "kc"] = late_kcs
