@@ -79,3 +79,46 @@ class CalculateCropEvapotranspirationTestCase(TestCase):
             3.14 * 0.774,
             places=2,
         )
+
+    def test_partial_run_before_planting(self):
+        self._test_partial_run(ndays=5)
+
+    def test_partial_run_init(self):
+        self._test_partial_run(ndays=30)
+
+    def test_partial_run_dev(self):
+        self._test_partial_run(ndays=50)
+
+    def test_partial_run_mid(self):
+        self._test_partial_run(ndays=80)
+
+    def test_partial_run_late(self):
+        self._test_partial_run(ndays=100)
+
+    def _test_partial_run(self, ndays):
+        """
+        Test that when we run the model with a partial time series that has only "ndays"
+        records the model runs properly until then. We do that by comparing the
+        resulting crop evapotranspiration timeseries with the first ndays of the entire
+        time series.
+        """
+        partial_timeseries = pd.DataFrame(
+            data={"ref_evapotranspiration": np.full(ndays, 3.14)},
+            index=pd.date_range("1974-05-12", periods=ndays),
+        )
+        calculate_crop_evapotranspiration(
+            timeseries=partial_timeseries,
+            planting_date=dt.date(1974, 5, 22),
+            kc_unplanted=0.1,
+            kc_ini=0.15,
+            kc_mid=1.19,
+            kc_end=0.35,
+            init=25,
+            dev=25,
+            mid=30,
+            late=20,
+        )
+        pd.testing.assert_series_equal(
+            partial_timeseries["crop_evapotranspiration"],
+            self.timeseries["crop_evapotranspiration"][:ndays],
+        )
