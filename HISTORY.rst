@@ -2,6 +2,13 @@
 History
 =======
 
+0.3.2 (2019-05-06)
+------------------
+
+- Fix crop evapotranspiration model, which could only run for the entire
+  period from planting to harvest; now it can run for part of the
+  period.
+
 0.3.1 (2019-03-27)
 ------------------
 
