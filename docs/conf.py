@@ -41,9 +41,9 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = u"swb"
-copyright = u"2018, Antonis Christofides"
-author = u"Antonis Christofides"
+project = "swb"
+copyright = "2018, Antonis Christofides"
+author = "Antonis Christofides"
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -119,7 +119,7 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass
 # [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, "swb.tex", u"swb Documentation", u"Antonis Christofides", "manual")
+    (master_doc, "swb.tex", "swb Documentation", "Antonis Christofides", "manual")
 ]
 
 
@@ -127,7 +127,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "swb", u"swb Documentation", [author], 1)]
+man_pages = [(master_doc, "swb", "swb Documentation", [author], 1)]
 
 
 # -- Options for Texinfo output ----------------------------------------
@@ -139,7 +139,7 @@ texinfo_documents = [
     (
         master_doc,
         "swb",
-        u"swb Documentation",
+        "swb Documentation",
         author,
         "swb",
         "One line description of project.",
