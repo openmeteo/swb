@@ -7,7 +7,7 @@ import pandas as pd
 from swb import calculate_crop_evapotranspiration
 
 
-class CalculateCropEvapotranspirationTestCase(TestCase):
+class CalculateCropEvapotranspirationTestMixin:
     """Functional testing of calculate_crop_evapotranspiration().
 
     We use the example of FAO56 (Box 15, Figure 36, Example 28, pp. 130-133) for
@@ -21,10 +21,7 @@ class CalculateCropEvapotranspirationTestCase(TestCase):
     """
 
     def setUp(self):
-        self.timeseries = pd.DataFrame(
-            data={"ref_evapotranspiration": np.full(110, 3.14)},
-            index=pd.date_range("1974-05-12", periods=110),
-        )
+        self._prepare_timeseries()
         calculate_crop_evapotranspiration(
             timeseries=self.timeseries,
             planting_date=dt.date(1974, 5, 22),
@@ -38,21 +35,40 @@ class CalculateCropEvapotranspirationTestCase(TestCase):
             late=20,
         )
 
+    def _prepare_timeseries(self):
+        self.timeseries = pd.DataFrame(
+            data={"ref_evapotranspiration": np.full(110, 3.14)},
+            index=pd.date_range(self._get_date("1974-05-12"), periods=110),
+        )
+
+    def _get_date(self, datestr):
+        return datestr
+
     def test_kc_start(self):
-        self.assertAlmostEqual(self.timeseries.loc["1974-05-12"]["kc"], 0.1, places=2)
+        self.assertAlmostEqual(
+            self.timeseries.loc[self._get_date("1974-05-12")]["kc"], 0.1, places=2
+        )
 
     def test_kc_end_before_planting(self):
-        self.assertAlmostEqual(self.timeseries.loc["1974-05-21"]["kc"], 0.1, places=2)
+        self.assertAlmostEqual(
+            self.timeseries.loc[self._get_date("1974-05-21")]["kc"], 0.1, places=2
+        )
 
     def test_kc_start_of_init(self):
-        self.assertAlmostEqual(self.timeseries.loc["1974-05-22"]["kc"], 0.15, places=2)
+        self.assertAlmostEqual(
+            self.timeseries.loc[self._get_date("1974-05-22")]["kc"], 0.15, places=2
+        )
 
     def test_kc_end_of_init(self):
-        self.assertAlmostEqual(self.timeseries.loc["1974-06-15"]["kc"], 0.15, places=2)
+        self.assertAlmostEqual(
+            self.timeseries.loc[self._get_date("1974-06-15")]["kc"], 0.15, places=2
+        )
 
     def test_kc_june_20(self):
         # This result is indicated in a paragraph just below Figure 36
-        self.assertAlmostEqual(self.timeseries.loc["1974-06-20"]["kc"], 0.36, places=2)
+        self.assertAlmostEqual(
+            self.timeseries.loc[self._get_date("1974-06-20")]["kc"], 0.36, places=2
+        )
 
     def test_kc_on_day_40(self):
         # Example 28 p. 133
@@ -104,7 +120,7 @@ class CalculateCropEvapotranspirationTestCase(TestCase):
         """
         partial_timeseries = pd.DataFrame(
             data={"ref_evapotranspiration": np.full(ndays, 3.14)},
-            index=pd.date_range("1974-05-12", periods=ndays),
+            index=pd.date_range(self._get_date("1974-05-12"), periods=ndays),
         )
         calculate_crop_evapotranspiration(
             timeseries=partial_timeseries,
@@ -122,3 +138,45 @@ class CalculateCropEvapotranspirationTestCase(TestCase):
             partial_timeseries["crop_evapotranspiration"],
             self.timeseries["crop_evapotranspiration"][:ndays],
         )
+
+
+class WithDateOnlyTimestampsTestCase(
+    CalculateCropEvapotranspirationTestMixin, TestCase
+):
+    pass
+
+
+class WithNonMidnightTimestampsTestCase(
+    CalculateCropEvapotranspirationTestMixin, TestCase
+):
+    """Test case for timeseries that end in a time different from 00:00.
+    """
+
+    def _get_date(self, datestr):
+        return datestr + " 23:59"
+
+
+class EmptyTimeseriesTestCase(TestCase):
+    def setUp(self):
+        self.timeseries = pd.DataFrame(data={"ref_evapotranspiration": []}, index=[])
+        calculate_crop_evapotranspiration(
+            timeseries=self.timeseries,
+            planting_date=dt.date(1974, 5, 22),
+            kc_unplanted=0.1,
+            kc_ini=0.15,
+            kc_mid=1.19,
+            kc_end=0.35,
+            init=25,
+            dev=25,
+            mid=30,
+            late=20,
+        )
+
+    def test_result_is_empty(self):
+        self.assertEqual(len(self.timeseries), 0)
+
+    def test_result_has_kc(self):
+        self.assertEqual(len(self.timeseries["kc"]), 0)
+
+    def test_result_has_crop_evapotranspiration(self):
+        self.assertEqual(len(self.timeseries["crop_evapotranspiration"]), 0)
