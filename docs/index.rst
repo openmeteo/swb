@@ -6,4 +6,5 @@ Swb - soil water balance
 
    swb
    crop_evapotranspiration
+   effective_precipitation
    license
