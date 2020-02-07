@@ -2,6 +2,12 @@
 History
 =======
 
+1.0.0 (2020-01-07)
+------------------
+
+- Added simple model to get effective precipitation from total
+  precipitation.
+
 0.3.3 (2019-12-13)
 ------------------
 
