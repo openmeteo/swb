@@ -166,6 +166,15 @@ where:
  * |ET_ci| is the crop evapotranspiration.
  * |DP_i| is the water loss through deep percolation.
 
+subject to this constraint:
+
+    |D_ri| ≤ TAW
+
+(:ref:`FAO56 <fao56>`, p. 170 eq. 86. That equation also has the
+constraint |D_ri| ≥ 0; however we allow |D_ri| to have negative values,
+because water content can actually exceed field capacity and reach
+saturation.)
+
 |CR_i| is ignored and considered zero.
 
 The evapotranspiration |ET_ci| is the reference evapotranspiration
