@@ -261,3 +261,33 @@ class ModelRunWithDpTestCase(TestCase):
 
     def test_dr3(self):
         self.assertAlmostEqual(self.df.iloc[2]["dr"], -3.706, places=3)
+
+
+class ModelRunWithDrOutsideLimitsTestCase(TestCase):
+    """Test FAO56 eq. 86 p. 170.
+    """
+
+    def setUp(self):
+        data = {
+            "effective_precipitation": [0, 80],
+            "actual_net_irrigation": [0, 0],
+            "crop_evapotranspiration": [50, 0.1],
+        }
+        self.df = pd.DataFrame(data, index=pd.date_range("2016-03-10", periods=2))
+        result = calculate_soil_water(
+            theta_s=0.425,
+            theta_fc=0.287,
+            theta_wp=0.14,
+            zr=0.5,
+            zr_factor=1000,
+            p=0.5,
+            draintime=16.3,
+            timeseries=self.df,
+            theta_init=0.15,
+            mif=1.0,
+        )
+        self.taw = result["taw"]
+
+    def test_dr1(self):
+        """Test that Dr cannot exceed TAW."""
+        self.assertAlmostEqual(self.df.iloc[0]["dr"], self.taw)
