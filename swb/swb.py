@@ -104,7 +104,7 @@ class SoilWaterBalance(object):
 
     def dr_without_irrig(self, dr_prev, theta_prev, ks, row):
         # "row" is a single row from self.timeseries
-        return (
+        result = (
             dr_prev
             - (
                 row["effective_precipitation"]
@@ -113,3 +113,5 @@ class SoilWaterBalance(object):
             + row["crop_evapotranspiration"] * ks
             + self.dp(theta_prev, row["effective_precipitation"])
         )
+        result = min(result, self.taw)
+        return result
