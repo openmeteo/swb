@@ -2,6 +2,11 @@
 History
 =======
 
+1.0.2 (2020-04-08)
+------------------
+
+- Fixed an issue when there was (unreasonably) large irrigation.
+
 1.0.1 (2020-04-03)
 ------------------
 

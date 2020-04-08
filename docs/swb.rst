@@ -205,10 +205,11 @@ between total and net irrigation; it accepts net irrigation as input
 The **deep percolation** is zero if we are at or below field capacity.
 If we are above field capacity (|θ_fc| < θ < |θ_s|) it is this:
 
-   |DP_i| = (|θ_s| - |θ_fc|) * |Z_r| / `draintime`
+   |DP_i| = (θ - |θ_fc|) * |Z_r| / `draintime`
 
-(i.e. if we need `draintime` days to go from |θ_s| to |θ_fc|, then each
-day we lose 1/`draintime` of that amount)
+If θ > |θ_s| (which technically can't happen, but θ can have this value
+as calculated in the previous step, notably if there has been too much
+irrigation) then |θ_s| is used instead of θ in the above equation.
 
 
 Reference
