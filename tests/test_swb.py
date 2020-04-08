@@ -291,3 +291,25 @@ class ModelRunWithDrOutsideLimitsTestCase(TestCase):
     def test_dr1(self):
         """Test that Dr cannot exceed TAW."""
         self.assertAlmostEqual(self.df.iloc[0]["dr"], self.taw)
+
+
+class DpTestCase(TestCase):
+    def setUp(self):
+        self.swb = SoilWaterBalance(
+            theta_s=0.425,
+            theta_fc=0.287,
+            theta_wp=0.14,
+            zr=0.5,
+            zr_factor=1000,
+            p=0.5,
+            draintime=16.3,
+            timeseries=None,
+            theta_init=0.15,
+            mif=1.0,
+        )
+
+    def test_dp_when_theta_less_than_theta_s(self):
+        self.assertAlmostEqual(self.swb.dp(0.4, 20.0), 4.69325153)
+
+    def test_dp_when_theta_more_than_theta_s(self):
+        self.assertAlmostEqual(self.swb.dp(0.5, 20.0), 5.46012270)

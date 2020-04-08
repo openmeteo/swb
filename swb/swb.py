@@ -97,9 +97,10 @@ class SoilWaterBalance(object):
         return max(result, 0)
 
     def dp(self, theta_prev, peff):
-        theta_prev_mm = theta_prev * self.zr * self.zr_factor
+        theta = min(theta_prev, self.theta_s)
+        theta_mm = theta * self.zr * self.zr_factor
         theta_fc_mm = self.theta_fc * self.zr * self.zr_factor
-        excess_water = theta_prev_mm - theta_fc_mm + peff
+        excess_water = theta_mm - theta_fc_mm + peff
         return max(excess_water, 0) / self.draintime
 
     def dr_without_irrig(self, dr_prev, theta_prev, ks, row):
