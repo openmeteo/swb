@@ -4,7 +4,7 @@ from unittest import TestCase
 import numpy as np
 import pandas as pd
 
-from swb import calculate_crop_evapotranspiration
+from swb import KcStage, calculate_crop_evapotranspiration
 
 
 class CalculateCropEvapotranspirationTestMixin:
@@ -13,7 +13,7 @@ class CalculateCropEvapotranspirationTestMixin:
     We use the example of FAO56 (Box 15, Figure 36, Example 28, pp. 130-133) for
     testing. However we consider a planting date of one day earlier than what the
     example says, otherwise results don't agree. We also use 10 additional days before
-    planting in order to test kc_unplanted.
+    planting in order to test kc_offseason.
 
     Start of time series: 1974-05-12
     Planting date: 1974-05-22
@@ -25,14 +25,14 @@ class CalculateCropEvapotranspirationTestMixin:
         calculate_crop_evapotranspiration(
             timeseries=self.timeseries,
             planting_date=dt.date(1974, 5, 22),
-            kc_unplanted=0.1,
-            kc_ini=0.15,
-            kc_mid=1.19,
-            kc_end=0.35,
-            init=25,
-            dev=25,
-            mid=30,
-            late=20,
+            kc_offseason=0.1,
+            kc_initial=0.15,
+            kc_stages=(
+                KcStage(25, 0.15),
+                KcStage(25, 1.19),
+                KcStage(30, 1.19),
+                KcStage(20, 0.35),
+            ),
         )
 
     def _prepare_timeseries(self):
@@ -125,14 +125,14 @@ class CalculateCropEvapotranspirationTestMixin:
         calculate_crop_evapotranspiration(
             timeseries=partial_timeseries,
             planting_date=dt.date(1974, 5, 22),
-            kc_unplanted=0.1,
-            kc_ini=0.15,
-            kc_mid=1.19,
-            kc_end=0.35,
-            init=25,
-            dev=25,
-            mid=30,
-            late=20,
+            kc_offseason=0.1,
+            kc_initial=0.15,
+            kc_stages=(
+                KcStage(25, 0.15),
+                KcStage(25, 1.19),
+                KcStage(30, 1.19),
+                KcStage(20, 0.35),
+            ),
         )
         pd.testing.assert_series_equal(
             partial_timeseries["crop_evapotranspiration"],
@@ -162,14 +162,14 @@ class EmptyTimeseriesTestCase(TestCase):
         calculate_crop_evapotranspiration(
             timeseries=self.timeseries,
             planting_date=dt.date(1974, 5, 22),
-            kc_unplanted=0.1,
-            kc_ini=0.15,
-            kc_mid=1.19,
-            kc_end=0.35,
-            init=25,
-            dev=25,
-            mid=30,
-            late=20,
+            kc_offseason=0.1,
+            kc_initial=0.15,
+            kc_stages=(
+                KcStage(25, 0.15),
+                KcStage(25, 1.19),
+                KcStage(30, 1.19),
+                KcStage(20, 0.35),
+            ),
         )
 
     def test_result_is_empty(self):
