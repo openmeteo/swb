@@ -5,6 +5,7 @@ History
 dev
 ---
 
+- Only Python >=3.6 is supported.
 - Specifying Kc for ``calculate_crop_evapotranspiration()`` has changed;
   it's now not only three values (Kc_init, Kc_mid, Kc_late), but an
   unlimited number of (number-of-days-in-stage, Kc-at-end-of-stage)
