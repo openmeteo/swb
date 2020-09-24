@@ -264,8 +264,7 @@ class ModelRunWithDpTestCase(TestCase):
 
 
 class ModelRunWithDrOutsideLimitsTestCase(TestCase):
-    """Test FAO56 eq. 86 p. 170.
-    """
+    """Test FAO56 eq. 86 p. 170."""
 
     def setUp(self):
         data = {

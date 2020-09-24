@@ -149,8 +149,7 @@ class WithDateOnlyTimestampsTestCase(
 class WithNonMidnightTimestampsTestCase(
     CalculateCropEvapotranspirationTestMixin, TestCase
 ):
-    """Test case for timeseries that end in a time different from 00:00.
-    """
+    """Test case for timeseries that end in a time different from 00:00."""
 
     def _get_date(self, datestr):
         return datestr + " 23:59"
