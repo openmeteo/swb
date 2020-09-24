@@ -24,7 +24,7 @@ class CalculateCropEvapotranspirationTestMixin:
             timeseries=self.timeseries,
             planting_date=dt.date(1974, 5, 23),
             kc_offseason=0.1,
-            kc_initial=0.15,
+            kc_plantingdate=0.15,
             kc_stages=(
                 KcStage(25, 0.15),
                 KcStage(25, 1.19),
@@ -127,7 +127,7 @@ class CalculateCropEvapotranspirationTestMixin:
             timeseries=partial_timeseries,
             planting_date=dt.date(1974, 5, 23),
             kc_offseason=0.1,
-            kc_initial=0.15,
+            kc_plantingdate=0.15,
             kc_stages=(
                 KcStage(25, 0.15),
                 KcStage(25, 1.19),
@@ -163,7 +163,7 @@ class EmptyTimeseriesTestCase(TestCase):
             timeseries=self.timeseries,
             planting_date=dt.date(1974, 5, 22),
             kc_offseason=0.1,
-            kc_initial=0.15,
+            kc_plantingdate=0.15,
             kc_stages=(
                 KcStage(25, 0.15),
                 KcStage(25, 1.19),

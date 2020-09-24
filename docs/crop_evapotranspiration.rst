@@ -22,7 +22,7 @@ Usage
        timeseries=a_pandas_dataframe,
        planting_date=dt.date(2019, 3, 21),
        kc_offseason=0.3,
-       kc_initial=0.7,
+       kc_plantingdate=0.7,
        kc_stages=(
           KcStage(35, 0.7),
           KcStage(45, 1.05),
@@ -40,7 +40,7 @@ stage) pairs. ``KcStage`` is a named tuple whose items are ``ndays`` and
 ``kc_end``. The planting_date corresponds to the beginning (day 1) of
 the first stage. At each stage, we do linear interpolation between the
 |K_c| at the end of the stage and the |K_c| at the end of the previous
-stage (or ``kc_initial`` if there's no previous stage).
+stage (or ``kc_plantingdate`` if there's no previous stage).
 
 This is a generalization of the methodology of :ref:`FAO56 <fao56>`,
 where three values are given for |K_c| (|K_c_ini|, |K_c_mid|,

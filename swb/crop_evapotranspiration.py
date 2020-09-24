@@ -7,13 +7,13 @@ KcStage = namedtuple("KcStage", ("ndays", "kc_end"))
 
 
 def calculate_crop_evapotranspiration(
-    *, timeseries, planting_date, kc_offseason, kc_initial, kc_stages
+    *, timeseries, planting_date, kc_offseason, kc_plantingdate, kc_stages
 ):
     model = CropEvapotranspiration(
         timeseries=timeseries,
         planting_date=planting_date,
         kc_offseason=kc_offseason,
-        kc_initial=kc_initial,
+        kc_plantingdate=kc_plantingdate,
         kc_stages=kc_stages,
     )
     model.calculate()
@@ -26,7 +26,7 @@ class CropEvapotranspiration(object):
 
     def calculate(self):
         self.timeseries["kc"] = self.kc_offseason
-        prev_kc = self.kc_initial
+        prev_kc = self.kc_plantingdate
         days_done = 0
         for stage in self.kc_stages:
             self._calculate_stage(stage, prev_kc, days_done)

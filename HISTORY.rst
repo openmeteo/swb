@@ -2,6 +2,12 @@
 History
 =======
 
+DEV
+---
+
+- ``calculate_crop_evapotranspiration()`` argument ``kc_initial`` has been
+  renamed to ``kc_plantingdate``.
+
 2.0.0 (2020-08-06)
 ------------------
 
