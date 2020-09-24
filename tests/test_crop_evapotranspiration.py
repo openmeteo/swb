@@ -11,20 +11,18 @@ class CalculateCropEvapotranspirationTestMixin:
     """Functional testing of calculate_crop_evapotranspiration().
 
     We use the example of FAO56 (Box 15, Figure 36, Example 28, pp. 130-133) for
-    testing. However we consider a planting date of one day earlier than what the
-    example says, otherwise results don't agree. We also use 10 additional days before
-    planting in order to test kc_offseason.
+    testing. We use 10 additional days before planting in order to test kc_offseason.
 
-    Start of time series: 1974-05-12
-    Planting date: 1974-05-22
-    Total crop lifetime: 100 days (1974-05-22 to 1974-08-29)
+    Start of time series: 1974-05-13
+    Planting date: 1974-05-23
+    Total crop lifetime: 100 days (1974-05-23 to 1974-08-30)
     """
 
     def setUp(self):
         self._prepare_timeseries()
         calculate_crop_evapotranspiration(
             timeseries=self.timeseries,
-            planting_date=dt.date(1974, 5, 22),
+            planting_date=dt.date(1974, 5, 23),
             kc_offseason=0.1,
             kc_initial=0.15,
             kc_stages=(
@@ -38,7 +36,7 @@ class CalculateCropEvapotranspirationTestMixin:
     def _prepare_timeseries(self):
         self.timeseries = pd.DataFrame(
             data={"ref_evapotranspiration": np.full(110, 3.14)},
-            index=pd.date_range(self._get_date("1974-05-12"), periods=110),
+            index=pd.date_range(self._get_date("1974-05-13"), periods=110),
         )
 
     def _get_date(self, datestr):
@@ -46,28 +44,31 @@ class CalculateCropEvapotranspirationTestMixin:
 
     def test_kc_start(self):
         self.assertAlmostEqual(
-            self.timeseries.loc[self._get_date("1974-05-12")]["kc"], 0.1, places=2
+            self.timeseries.loc[self._get_date("1974-05-13")]["kc"], 0.1, places=2
         )
 
     def test_kc_end_before_planting(self):
         self.assertAlmostEqual(
-            self.timeseries.loc[self._get_date("1974-05-21")]["kc"], 0.1, places=2
+            self.timeseries.loc[self._get_date("1974-05-22")]["kc"], 0.1, places=2
         )
 
     def test_kc_start_of_init(self):
         self.assertAlmostEqual(
-            self.timeseries.loc[self._get_date("1974-05-22")]["kc"], 0.15, places=2
+            self.timeseries.loc[self._get_date("1974-05-23")]["kc"], 0.15, places=2
         )
 
     def test_kc_end_of_init(self):
         self.assertAlmostEqual(
-            self.timeseries.loc[self._get_date("1974-06-15")]["kc"], 0.15, places=2
+            self.timeseries.loc[self._get_date("1974-06-16")]["kc"], 0.15, places=2
         )
 
-    def test_kc_june_20(self):
-        # This result is indicated in a paragraph just below Figure 36
+    def test_kc_june_21(self):
+        # This result is indicated in a paragraph just below Figure 36. It's not clear
+        # from that paragraph whether 0.36 should be on 20 June or on 21 June. Our code
+        # produces this result on 21 June. Since we get the numbers for days 40, 70 and
+        # 95 correctly (see other tests), we conclude 21 June is fine.
         self.assertAlmostEqual(
-            self.timeseries.loc[self._get_date("1974-06-20")]["kc"], 0.36, places=2
+            self.timeseries.loc[self._get_date("1974-06-21")]["kc"], 0.36, places=2
         )
 
     def test_kc_on_day_40(self):
@@ -120,11 +121,11 @@ class CalculateCropEvapotranspirationTestMixin:
         """
         partial_timeseries = pd.DataFrame(
             data={"ref_evapotranspiration": np.full(ndays, 3.14)},
-            index=pd.date_range(self._get_date("1974-05-12"), periods=ndays),
+            index=pd.date_range(self._get_date("1974-05-13"), periods=ndays),
         )
         calculate_crop_evapotranspiration(
             timeseries=partial_timeseries,
-            planting_date=dt.date(1974, 5, 22),
+            planting_date=dt.date(1974, 5, 23),
             kc_offseason=0.1,
             kc_initial=0.15,
             kc_stages=(
