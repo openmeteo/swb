@@ -52,23 +52,33 @@ class SoilWaterBalance(object):
         self.timeseries["theta"] = np.nan
         self.timeseries["ks"] = np.nan
         self.timeseries["recommended_net_irrigation"] = np.nan
+        self.timeseries["assumed_net_irrigation"] = np.nan
 
         # Loop and perform the calculation
         theta_prev = self.theta_init
         dr_prev = self.dr_from_theta(theta_prev)
+        dr_saturation = (self.theta_fc - self.theta_s) * self.zr * self.zr_factor
         for date in self.timeseries.index:
             row = self.timeseries.loc[date]
             ks = self.ks(dr_prev)
             dr_without_irrig = self.dr_without_irrig(dr_prev, theta_prev, ks, row)
+            recommended_net_irrigation = (
+                dr_without_irrig * self.mif if dr_without_irrig > self.raw else 0
+            )
 
-            ani = row["actual_net_irrigation"]
-            auto_apply_irrigation = type(ani) == np.bool_ and ani
-            assumed_net_irrigation = 0 if auto_apply_irrigation else ani
-            dr = dr_without_irrig - assumed_net_irrigation
-            recommended_net_irrigation = dr * self.mif if dr > self.raw else 0
-            if auto_apply_irrigation and dr_without_irrig > self.raw:
-                dr = dr_without_irrig - recommended_net_irrigation
+            if row["actual_net_irrigation"] == "model":
+                assumed_net_irrigation = recommended_net_irrigation
+            elif row["actual_net_irrigation"] == "fc":
+                if dr_without_irrig > 0:
+                    assumed_net_irrigation = dr_without_irrig
+                elif dr_without_irrig > dr_saturation:
+                    assumed_net_irrigation = dr_without_irrig - dr_saturation
+                else:
+                    assumed_net_irrigation = 0
+            else:
+                assumed_net_irrigation = row["actual_net_irrigation"]
 
+            dr = self.dr(dr_without_irrig, assumed_net_irrigation)
             theta = self.theta_from_dr(dr)
             self.timeseries.at[date, "dr"] = dr
             self.timeseries.at[date, "theta"] = theta
@@ -76,6 +86,7 @@ class SoilWaterBalance(object):
             self.timeseries.at[
                 date, "recommended_net_irrigation"
             ] = recommended_net_irrigation
+            self.timeseries.at[date, "assumed_net_irrigation"] = assumed_net_irrigation
             theta_prev = theta
             dr_prev = dr
 
@@ -105,7 +116,7 @@ class SoilWaterBalance(object):
 
     def dr_without_irrig(self, dr_prev, theta_prev, ks, row):
         # "row" is a single row from self.timeseries
-        result = (
+        return (
             dr_prev
             - (
                 row["effective_precipitation"]
@@ -114,5 +125,8 @@ class SoilWaterBalance(object):
             + row["crop_evapotranspiration"] * ks
             + self.dp(theta_prev, row["effective_precipitation"])
         )
+
+    def dr(self, dr_without_irrig, assumed_net_irrigation):
+        result = dr_without_irrig - assumed_net_irrigation
         result = min(result, self.taw)
         return result

@@ -2,6 +2,15 @@
 History
 =======
 
+4.0.0 (2020-05-14)
+------------------
+
+- ``actual_net_irrigation`` cannot be ``True`` any more; instead, it can
+  have the value "model" (same as what ``True`` was) or "fc" (new
+  functionality).
+- There is now an additional output column, ``assumed_net_irrigation``,
+  useful when ``actual_net_irrigation`` is "model" or "fc".
+
 3.0.0 (2020-09-24)
 ------------------
 

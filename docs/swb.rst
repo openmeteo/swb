@@ -82,7 +82,7 @@ needed to "fill it up"; that is, the amount of water that is needed to
 reach field capacity. The depletion is normally measured in mm.
 
 This is the relation between depletion |D_r| and water content θ:
- 
+
    |D_r| = (|θ_fc| - θ) |Z_r|
 
 (:ref:`FAO56 <fao56>`, p. 170 eq. 87)
@@ -148,7 +148,7 @@ going to call it the **malamos irrigation fraction** or mif.
 
 Calculation of depletion
 ------------------------
-   
+
 The basis for the calculation is this formula:
 
     |D_ri| = |D_ri-1| - (|P_i| - |RO_i|) - |IR_ni| - |CR_i| + |ET_ci| + |DP_i|
@@ -231,7 +231,7 @@ Reference
            theta_init=0.19,
            mif=0.5,
        )
-       
+
    :param float theta_s: Water content at saturation.
    :param float theta_fc: Water content at field capacity.
    :param float theta_wp: Water content at wilting point.
@@ -262,12 +262,23 @@ Reference
 
       The "actual_net_irrigation" is the applied net irrigation (that
       is, the total applied irrigation multiplied by the irrigation
-      efficiency).
+      efficiency). Each record of the actual net irrigation is either a
+      floating point number expressing the amount of water, or the
+      string "model", or the string "fc".
 
-      If in a day it is known that we irrigated but not how much,
-      "applied_net_irrigation" may simply be the boolean ``True`` for
-      that day. In this case, it is assumed that we irrigated with the
-      recommended amount that was calculated by the model.
+      If it is the string "model", then it is assumed that the amount of
+      water equals the recommended amount that was calculated by the
+      model.
+
+      If it is the string "fc", it is assumed that the amount of water
+      is what the model calculates that would be required to bring the
+      soil to field capacity. If it's already at field capacity but
+      below saturation, it is what the model calculates that would be
+      required to bring the soil to saturation. If it's already at
+      saturation or higher, zero is assumed. The purpose of this option
+      is to make some assumption about the amount of water when it is
+      known that a field was irrigated (presumably sufficiently) but the
+      amount of water is unknown.
 
    :param float theta_init:
       The initial water content (that is, the water content at the first date
@@ -284,13 +295,30 @@ Reference
       :raw: The readily available water.
       :taw: The total available water.
       :timeseries:
-         The original dataframe with additional columns added, namely
-         ``dr`` for depletion, ``theta`` for soil moisture, ``ks`` for
-         the water stress coefficient, and
-         ``recommended_net_irrigation`` for the calculated recommended
-         net irrigation.  The original dataframe is changed in place (so
-         the caller doesn't really need it returned), but the original
-         columns and index are untouched.
+         The original dataframe with additional columns added, namely:
+
+         ``dr``
+           The depletion.
+
+         ``theta``
+           The soil moisture.
+
+         ``ks``
+           The water stress coefficient.
+
+         ``recommended_net_irrigation``
+           The calculated recommended net irrigation.
+
+         ``assumed_net_irrigation``
+           This equals ``actual_net_irrigation`` where the latter's
+           value is a floating point number. Where
+           ``actual_net_irrigation``'s value is "model" or "fc",
+           ``assumed_net_irrigation`` contains the assumed amount of
+           water.
+
+         The original dataframe is changed in place (so the caller
+         doesn't really need it returned), but the original columns and
+         index are untouched.
 
 References
 ==========

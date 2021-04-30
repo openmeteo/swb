@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+import numpy as np
 import pandas as pd
 
 from swb import SoilWaterBalance, calculate_soil_water
@@ -53,214 +54,88 @@ class SimpleMethodsTestCase(TestCase):
         self.assertEqual(self.swb.ro(2, 0.14), 0)
 
 
-class ModelRunWithActualNetIrrigationTestCase(TestCase):
-    def setUp(self):
+class ModelTestCase(TestCase):
+    @classmethod
+    def setUpData(cls):
         data = {
-            "effective_precipitation": [0, 4.8],
-            "actual_net_irrigation": [0, 0],
-            "crop_evapotranspiration": [3.871, 3.990],
+            "effective_precipitation": [0, 0, 4, 0],
+            "actual_net_irrigation": [3000, 0, 0, 0],
+            "crop_evapotranspiration": [49, 350, 3.5, 49],
         }
-        self.df = pd.DataFrame(data, index=pd.date_range("2019-03-07", periods=2))
+        cls.df = pd.DataFrame(data, index=pd.date_range("2018-03-15", periods=4))
+
+    @classmethod
+    def setUpClass(cls):
+        cls.setUpData()
         calculate_soil_water(
-            theta_s=0.425,
-            theta_fc=0.287,
-            theta_wp=0.14,
-            zr=0.5,
+            theta_s=0.5,
+            theta_fc=0.4,
+            theta_wp=0.1,
+            zr=0.95,
             zr_factor=1000,
             p=0.5,
-            draintime=16.2,
-            timeseries=self.df,
-            theta_init=0.252784,
-            mif=None,
-        )
-
-    def test_dr1(self):
-        self.assertAlmostEqual(self.df.iloc[0]["dr"], 20.979, places=3)
-
-    def test_dr2(self):
-        self.assertAlmostEqual(self.df.iloc[1]["dr"], 20.169, places=3)
-
-    def test_theta1(self):
-        self.assertAlmostEqual(self.df.iloc[0]["theta"], 0.245, places=3)
-
-    def test_theta2(self):
-        self.assertAlmostEqual(self.df.iloc[1]["theta"], 0.247, places=3)
-
-    def test_ks1(self):
-        self.assertAlmostEqual(self.df.iloc[0]["ks"], 1)
-
-    def test_ks2(self):
-        self.assertAlmostEqual(self.df.iloc[1]["ks"], 1)
-
-    def test_recommended_net_irrigation1(self):
-        self.assertAlmostEqual(self.df.iloc[0]["recommended_net_irrigation"], 0)
-
-    def test_recommended_net_irrigation2(self):
-        self.assertAlmostEqual(self.df.iloc[1]["recommended_net_irrigation"], 0)
-
-
-class ModelRunWithNonzeroKsTestCase(TestCase):
-    def setUp(self):
-        data = {
-            "effective_precipitation": [0, 0],
-            "actual_net_irrigation": [0, 0],
-            "crop_evapotranspiration": [3.724, 3.906],
-        }
-        self.df = pd.DataFrame(data, index=pd.date_range("2019-08-18", periods=2))
-        calculate_soil_water(
-            theta_s=0.425,
-            theta_fc=0.287,
-            theta_wp=0.14,
-            zr=0.5,
-            zr_factor=1000,
-            p=0.5,
-            draintime=16.2,
-            timeseries=self.df,
-            theta_init=0.218956,
-            mif=1,
-        )
-
-    def test_dr1(self):
-        self.assertAlmostEqual(self.df.iloc[0]["dr"], 37.746, places=3)
-
-    def test_dr2(self):
-        self.assertAlmostEqual(self.df.iloc[1]["dr"], 41.546, places=3)
-
-    def test_theta1(self):
-        self.assertAlmostEqual(self.df.iloc[0]["theta"], 0.212, places=3)
-
-    def test_theta2(self):
-        self.assertAlmostEqual(self.df.iloc[1]["theta"], 0.204, places=3)
-
-    def test_ks1(self):
-        self.assertAlmostEqual(self.df.iloc[0]["ks"], 1)
-
-    def test_ks2(self):
-        self.assertAlmostEqual(self.df.iloc[1]["ks"], 0.973, places=3)
-
-
-class ModelRunWithAutoApplyIrrigationTestCase(TestCase):
-    def setUp(self):
-        data = {
-            "effective_precipitation": [0, 0, 0],
-            "actual_net_irrigation": [True, True, True],
-            "crop_evapotranspiration": [3.647, 3.822, 3.885],
-        }
-        self.df = pd.DataFrame(data, index=pd.date_range("2019-03-07", periods=3))
-        calculate_soil_water(
-            theta_s=0.425,
-            theta_fc=0.287,
-            theta_wp=0.14,
-            zr=0.5,
-            zr_factor=1000,
-            p=0.5,
-            draintime=16.2,
-            timeseries=self.df,
-            theta_init=0.223646,
-            mif=1.0,
-        )
-
-    def test_dr1(self):
-        self.assertAlmostEqual(self.df.iloc[0]["dr"], 35.324, places=3)
-
-    def test_dr2(self):
-        self.assertAlmostEqual(self.df.iloc[1]["dr"], 0, places=3)
-
-    def test_dr3(self):
-        self.assertAlmostEqual(self.df.iloc[2]["dr"], 3.885, places=3)
-
-    def test_theta1(self):
-        self.assertAlmostEqual(self.df.iloc[0]["theta"], 0.216, places=3)
-
-    def test_theta2(self):
-        self.assertAlmostEqual(self.df.iloc[1]["theta"], 0.287, places=3)
-
-    def test_theta3(self):
-        self.assertAlmostEqual(self.df.iloc[2]["theta"], 0.279, places=3)
-
-    def test_recommended_net_irrigation1(self):
-        self.assertAlmostEqual(self.df.iloc[0]["recommended_net_irrigation"], 0)
-
-    def test_recommended_net_irrigation2(self):
-        self.assertAlmostEqual(
-            self.df.iloc[1]["recommended_net_irrigation"], 39.146, places=3
-        )
-
-    def test_recommended_net_irrigation3(self):
-        self.assertAlmostEqual(self.df.iloc[2]["recommended_net_irrigation"], 0)
-
-
-class MifTestCase(TestCase):
-    def setUp(self):
-        data = {
-            "effective_precipitation": [0, 0, 0],
-            "actual_net_irrigation": [True, True, True],
-            "crop_evapotranspiration": [3.647, 3.822, 3.885],
-        }
-        self.df = pd.DataFrame(data, index=pd.date_range("2019-03-07", periods=3))
-        calculate_soil_water(
-            theta_s=0.425,
-            theta_fc=0.287,
-            theta_wp=0.14,
-            zr=0.5,
-            zr_factor=1000,
-            p=0.5,
-            draintime=16.2,
-            timeseries=self.df,
-            theta_init=0.223646,
+            draintime=28.6,
+            timeseries=cls.df,
+            theta_init=0.4,
             mif=0.5,
         )
 
-    def test_dr1(self):
-        self.assertAlmostEqual(self.df.iloc[0]["dr"], 35.324, places=3)
-
-    def test_dr2(self):
-        self.assertAlmostEqual(self.df.iloc[1]["dr"], 19.573, places=3)
-
-    def test_dr3(self):
-        self.assertAlmostEqual(self.df.iloc[2]["dr"], 23.458, places=3)
-
-    def test_recommended_net_irrigation1(self):
-        self.assertAlmostEqual(self.df.iloc[0]["recommended_net_irrigation"], 0)
-
-    def test_recommended_net_irrigation2(self):
-        self.assertAlmostEqual(
-            self.df.iloc[1]["recommended_net_irrigation"], 19.573, places=3
+    def test_dr(self):
+        np.testing.assert_almost_equal(
+            self.df["dr"], [-2951.0, 258.3, 255.0, 265.3], decimal=1
         )
 
-    def test_recommended_net_irrigation3(self):
-        self.assertAlmostEqual(self.df.iloc[2]["recommended_net_irrigation"], 0)
+    def test_theta(self):
+        np.testing.assert_almost_equal(
+            self.df["theta"], [3.506, 0.128, 0.132, 0.121], decimal=3
+        )
+
+    def test_ks(self):
+        np.testing.assert_almost_equal(self.df["ks"], [1, 1, 0.187, 0.211], decimal=3)
+
+    def test_recommended_net_irrigation(self):
+        np.testing.assert_almost_equal(
+            self.df["recommended_net_irrigation"], [0, 129.2, 127.5, 132.7], decimal=1
+        )
+
+    def test_assumed_net_irrigation(self):
+        np.testing.assert_almost_equal(
+            self.df["assumed_net_irrigation"], [3000, 0, 0, 0], decimal=3
+        )
 
 
-class ModelRunWithDpTestCase(TestCase):
-    def setUp(self):
+class AutoApplyIrrigationTestCase(ModelTestCase):
+    @classmethod
+    def setUpData(cls):
         data = {
-            "effective_precipitation": [0, 5.544, 2.664],
-            "actual_net_irrigation": [0, 0, 0],
-            "crop_evapotranspiration": [1.043, 0.952, 0.868],
+            "effective_precipitation": [0, 0, 4, 0],
+            "actual_net_irrigation": ["model", "model", "model", "model"],
+            "crop_evapotranspiration": [49, 350, 3.5, 49],
         }
-        self.df = pd.DataFrame(data, index=pd.date_range("2016-03-10", periods=3))
-        calculate_soil_water(
-            theta_s=0.425,
-            theta_fc=0.287,
-            theta_wp=0.14,
-            zr=0.5,
-            zr_factor=1000,
-            p=0.5,
-            draintime=16.3,
-            timeseries=self.df,
-            theta_init=0.284732,
-            mif=1.0,
+        cls.df = pd.DataFrame(data, index=pd.date_range("2018-03-15", periods=4))
+
+    def test_dr(self):
+        np.testing.assert_almost_equal(
+            self.df["dr"], [49, 199.5, 98.8, 73.9], decimal=1
         )
 
-    def test_dr1(self):
-        self.assertAlmostEqual(self.df.iloc[0]["dr"], 2.177, places=3)
+    def test_theta(self):
+        np.testing.assert_almost_equal(
+            self.df["theta"], [0.348, 0.190, 0.296, 0.322], decimal=3
+        )
 
-    def test_dr2(self):
-        self.assertAlmostEqual(self.df.iloc[1]["dr"], -2.208, places=3)
+    def test_ks(self):
+        np.testing.assert_almost_equal(self.df["ks"], [1, 1, 0.600, 1], decimal=3)
 
-    def test_dr3(self):
-        self.assertAlmostEqual(self.df.iloc[2]["dr"], -3.706, places=3)
+    def test_recommended_net_irrigation(self):
+        np.testing.assert_almost_equal(
+            self.df["recommended_net_irrigation"], [0, 199.5, 98.8, 73.9], decimal=1
+        )
+
+    def test_assumed_net_irrigation(self):
+        np.testing.assert_almost_equal(
+            self.df["assumed_net_irrigation"], [0, 199.5, 98.8, 73.9], decimal=1
+        )
 
 
 class ModelRunWithDrOutsideLimitsTestCase(TestCase):
@@ -287,9 +162,8 @@ class ModelRunWithDrOutsideLimitsTestCase(TestCase):
         )
         self.taw = result["taw"]
 
-    def test_dr1(self):
-        """Test that Dr cannot exceed TAW."""
-        self.assertAlmostEqual(self.df.iloc[0]["dr"], self.taw)
+    def test_dr(self):
+        np.testing.assert_almost_equal(self.df["dr"], [self.taw, -6.101], decimal=3)
 
 
 class DpTestCase(TestCase):
