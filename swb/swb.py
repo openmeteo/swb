@@ -29,7 +29,7 @@ class SoilWaterBalance(object):
     # cr - Capillary rise
     # dp - Deep percolation
     # dr - Root zone depletion
-    # mif - Malamos irrigation factor
+    # refill_factor - Refill factor
 
     def __init__(self, **kwargs):
         self.theta_s = kwargs["theta_s"]
@@ -41,7 +41,7 @@ class SoilWaterBalance(object):
         self.draintime = kwargs["draintime"]
         self.timeseries = kwargs["timeseries"]
         self.theta_init = kwargs["theta_init"]
-        self.mif = kwargs["mif"]
+        self.refill_factor = kwargs["refill_factor"]
 
         self.taw = (self.theta_fc - self.theta_wp) * self.zr * self.zr_factor
         self.raw = self.p * self.taw
@@ -63,7 +63,9 @@ class SoilWaterBalance(object):
             ks = self.ks(dr_prev)
             dr_without_irrig = self.dr_without_irrig(dr_prev, theta_prev, ks, row)
             recommended_net_irrigation = (
-                dr_without_irrig * self.mif if dr_without_irrig > self.raw else 0
+                dr_without_irrig * self.refill_factor
+                if dr_without_irrig > self.raw
+                else 0
             )
 
             if row["actual_net_irrigation"] == "model":

@@ -2,7 +2,12 @@
 History
 =======
 
-4.0.0 (2020-05-14)
+5.0.0 (2021-08-13)
+------------------
+
+- ``mif`` has been renamed to ``refill_factor``.
+
+4.0.0 (2021-05-14)
 ------------------
 
 - ``actual_net_irrigation`` cannot be ``True`` any more; instead, it can

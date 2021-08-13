@@ -41,7 +41,7 @@ Usage
        draintime=2.2,
        timeseries=a_pandas_dataframe,
        theta_init=0.19,
-       mif=0.5,
+       refill_factor=0.5,
    )
 
 See the reference section below for what all this means.
@@ -142,9 +142,7 @@ When the water content reaches the threshold (i.e. when |D_r| reaches
 RAW), we need to irrigate. Normally the amount of water we irrigate with
 is RAW. But sometimes we prefer to throw in a fraction of that amount.
 This will result in more frequent irrigations thereafter and is
-beneficial in some cases. :ref:`TEIEP (2014, p. 92) <teiep2014>`
-confusingly calls this fraction the "irrigation optimizer", but we are
-going to call it the **malamos irrigation fraction** or mif.
+beneficial in some cases. This fraction is called the **refill factor**.
 
 Calculation of depletion
 ------------------------
@@ -229,7 +227,7 @@ Reference
            draintime=2.2,
            timeseries=a_pandas_dataframe,
            theta_init=0.19,
-           mif=0.5,
+           refill_factor=0.5,
        )
 
    :param float theta_s: Water content at saturation.
@@ -284,7 +282,7 @@ Reference
       The initial water content (that is, the water content at the first date
       of the time series).
 
-   :param float mif: The Malamos irrigation fraction.
+   :param float refill_factor: The refill factor.
 
    :rtype: dict
 
@@ -335,11 +333,3 @@ N. Malamos, I. L. Tsirogiannis, and A. Christofides, Modelling
 irrigation management services: the IRMA_SYS case, International
 Journal of Sustainable Agricultural Management and Informatics, 2
 (1), 1–18, 2016.
-
-.. _teiep2014:
-
-TEIEP (Technological Educational Institute of Epirus), Deliverable
-5.3.1: Detailed plan regarding the information system setup, for project
-Development of an Irrigation Information System for the plain of Arta
-(IRMA_SYS Arta), 2014. Available at
-https://irma.irrigation-management.eu/deliverables/Del531_DPIRMASYS.pdf

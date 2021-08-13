@@ -18,7 +18,7 @@ class SimpleMethodsTestCase(TestCase):
             draintime=16.2,
             timeseries=None,
             theta_init=None,
-            mif=None,
+            refill_factor=None,
         )
 
     def test_taw(self):
@@ -77,7 +77,7 @@ class ModelTestCase(TestCase):
             draintime=28.6,
             timeseries=cls.df,
             theta_init=0.4,
-            mif=0.5,
+            refill_factor=0.5,
         )
 
     def test_dr(self):
@@ -158,7 +158,7 @@ class ModelRunWithDrOutsideLimitsTestCase(TestCase):
             draintime=16.3,
             timeseries=self.df,
             theta_init=0.15,
-            mif=1.0,
+            refill_factor=1.0,
         )
         self.taw = result["taw"]
 
@@ -178,7 +178,7 @@ class DpTestCase(TestCase):
             draintime=16.3,
             timeseries=None,
             theta_init=0.15,
-            mif=1.0,
+            refill_factor=1.0,
         )
 
     def test_dp_when_theta_less_than_theta_s(self):
