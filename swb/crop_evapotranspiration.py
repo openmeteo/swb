@@ -48,7 +48,7 @@ class CropEvapotranspiration(object):
 
     def _date_to_timestamp(self, date):
         try:
-            time = self.timeseries.index[0].time()
+            time = self.timeseries.index[0].timetz()
         except IndexError:
-            time = dt.time(0, 0)
+            time = dt.time(0, 0, tzinfo=getattr(self.timeseries.index, "tz", None))
         return dt.datetime.combine(date, time)

@@ -2,6 +2,12 @@
 History
 =======
 
+5.0.1 (2024-04-14)
+------------------
+
+- ``calculate_crop_evapotranspiration()`` now works with aware (as well
+  as with naive) time series.
+
 5.0.0 (2021-08-13)
 ------------------
 
