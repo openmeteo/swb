@@ -1,4 +1,5 @@
 import datetime as dt
+import warnings
 from unittest import TestCase
 
 import numpy as np
@@ -154,6 +155,25 @@ class WithNonMidnightTimestampsTestCase(
 
     def _get_date(self, datestr):
         return datestr + " 23:59"
+
+
+class WithAwareTimestampsTestCase(CalculateCropEvapotranspirationTestMixin, TestCase):
+    """Test case for timeseries that have aware timestamps."""
+
+    def setUp(self):
+        super().setUp()
+        # Pandas throws a warning if we try to index an aware timeseries with a naive
+        # index. We convert warnings into errors in order for the test to fail if
+        # this happends.
+        warnings.filterwarnings("error")
+
+    def tearDown(self):
+        warnings.resetwarnings()
+        super().tearDown()
+
+    def _get_date(self, datestr):
+        y, m, d = [int(x) for x in datestr.split("-")]
+        return dt.datetime(y, m, d, 23, 59, tzinfo=dt.timezone(dt.timedelta(hours=2)))
 
 
 class EmptyTimeseriesTestCase(TestCase):
